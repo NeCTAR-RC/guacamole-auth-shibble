@@ -128,7 +128,7 @@ public class ShibbleAuthenticationProvider extends SimpleAuthenticationProvider 
     public static final StringGuacamoleProperty SHIBBOLETH_USERNAME_HEADER = new StringGuacamoleProperty() {
 
         @Override
-        public String getName() { return "shbboleth-username-header"; }
+        public String getName() { return "shibboleth-username-header"; }
 
     };
 
