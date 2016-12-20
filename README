@@ -1,0 +1,93 @@
+------------------------------------------------------------
+ What is guacamole-auth-shibble?
+------------------------------------------------------------
+
+guacamole-auth-shibble is a Java library for use with the Guacamole web
+application which uses Shibboleth with a MySQL database for looking up
+local passwords. It is intended for use with the Shibble python web app.
+
+The remote_user header is used as field for identifying users based on their
+Shibboleth authentication. This value is then used as a look up for a
+password from the given database.
+
+Remote desktop configuration settings are found from the given XML file,
+and passed through to Guacamole. Shibboleth username (in our case, we use
+the email address) and password resolved from the database are then added
+to the RDP configuration settings and a seamless login should occur.
+
+This code is targeting Guacamole v0.9.9
+
+------------------------------------------------------------
+ Compiling and installing guacamole-auth-shibble
+------------------------------------------------------------
+
+guacamole-auth-shibble is built using Maven. Building guacamole-auth-shibble
+compiles all classes and packages them into a redistributable .jar file. This
+.jar file can be installed in the library directory configured in
+guacamole.properties such that the authentication provider is available.
+
+1) Run mvn package
+
+    $ mvn package
+
+    Maven will download any needed dependencies for building the .jar file.
+    Once all dependencies have been downloaded, the .jar file will be
+    created in the target/ subdirectory of the current directory.
+
+    If this process fails, check the build errors, and verify that the
+    contents of your settings.xml file is correct.
+
+2) Extract the .tar.gz file now present in the target/ directory, and
+   place the .jar files in the extracted lib/ subdirectory in the library
+   directory specified in guacamole.properties.
+
+    You will likely need to do this as root.
+
+    If you do not have a library directory configured in your
+    guacamole.properties, you will need to specify one. The directory
+    is specified using the "lib-directory" property.
+
+3) Write a shibble-config.xml file containing all desired connections
+
+    The guacamole-auth-shibble authentication provided is configured by a
+    static XML file which lists all available connections.
+
+    The file consists of a single <configs> tag which contains any number of
+    <config> tags, each having a name and protocol. These <config> tags
+    correspond to connections.
+
+    Each <config> can contain any number of <param> tags which correspond to
+    the parameters of the protocol chosen. Each <param> tag has a name and
+    value, where the name is defined by the documentation of the protocol
+    being used.
+
+    For example, to define a single RDP connection to your RDP server with
+    the hostname "my-rdp-server-hostname", you could write:
+
+    <configs>
+      <config name="my-rdp-server" protocol="rdp">
+        <param name="hostname" value="my-rdp-server-hostname" />
+        <param name="port" value="3389" />
+      </config>
+    </configs>
+
+    When completed, this file should be placed in a common location such
+    that it can be referenced from guacamole.properties, like
+    /etc/guacamole/shibble-config.xml.
+
+4) Configure guacamole.properties
+
+    An additional property is required by guacamole-auth-shibble which defines
+    where the configuration file is found. It must be added to your
+    guacamole.properties:
+
+    # Configuration for Shibble Auth
+    shibble-config: /etc/guacamole/shibble-config.xml
+
+5) Restart Tomcat
+
+    The guacamole.properties file as well as any authentication provider .jar
+    files are only read when Tomcat starts. This goes for any other servlet
+    container as well.
+
+    You must restart Tomcat before any of the above changes can take effect.

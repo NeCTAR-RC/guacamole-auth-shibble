@@ -1,0 +1,16 @@
+{
+
+    "guacamoleVersion" : "0.9.9",
+
+    "name"      : "Shibble Authentication",
+    "namespace" : "guac-shibble",
+
+    "authProviders" : [
+        "org.nectar.guacamole.net.auth.shibble.ShibbleAuthenticationProvider"
+    ],
+
+    "translations" : [
+        "translations/en.json"
+    ]
+
+}
