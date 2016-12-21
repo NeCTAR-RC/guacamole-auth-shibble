@@ -27,6 +27,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Enumeration;
 import java.io.BufferedReader;
@@ -261,6 +262,9 @@ public class ShibbleAuthenticationProvider extends SimpleAuthenticationProvider 
     @Override
     public Map<String, GuacamoleConfiguration> getAuthorizedConfigurations(Credentials credentials) throws GuacamoleException {
 
+        // Define a new empty configs map
+        Map<String, GuacamoleConfiguration> newConfigs = new HashMap<String, GuacamoleConfiguration>();
+
         // Check mapping file mod time
         File configFile = getConfigurationFile();
         if (configFile.exists() && configTime < configFile.lastModified()) {
@@ -274,6 +278,7 @@ public class ShibbleAuthenticationProvider extends SimpleAuthenticationProvider 
             }
 
         }
+
 
         HttpServletRequest request = credentials.getRequest();
         if (request == null)
@@ -327,10 +332,18 @@ public class ShibbleAuthenticationProvider extends SimpleAuthenticationProvider 
             while (rs.next()) {
                 String remoteUserPassword = rs.getString("password");
                 for (Map.Entry<String, GuacamoleConfiguration> entry : configs.entrySet()) {
-                    logger.info("Adding user '{}' to configuration '{}'", remoteUser, entry.getKey());
-                    GuacamoleConfiguration config = entry.getValue();
-                    config.setParameter("username", remoteUser.toLowerCase());
-                    config.setParameter("password", remoteUserPassword);
+
+                    String name = remoteUser.toLowerCase() + "_" + entry.getKey();
+                    GuacamoleConfiguration baseConfig = entry.getValue();
+                    GuacamoleConfiguration newConfig = new GuacamoleConfiguration();
+
+                    newConfig.setProtocol(baseConfig.getProtocol());
+                    newConfig.setParameters(baseConfig.getParameters());
+                    newConfig.setParameter("username", remoteUser.toLowerCase());
+                    newConfig.setParameter("password", remoteUserPassword);
+
+                    logger.info("Adding user '{}' to configuration '{}'", remoteUser, name);
+                    newConfigs.put(name, newConfig);
                 }
             }
         } catch (Exception e) {
@@ -350,10 +363,10 @@ public class ShibbleAuthenticationProvider extends SimpleAuthenticationProvider 
         }
 
         // If no mapping available, report as such
-        if (configs == null)
+        if (newConfigs == null)
             throw new GuacamoleServerException("Configuration could not be read.");
 
-        return configs;
+        return newConfigs;
 
     }
 }

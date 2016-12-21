@@ -5,7 +5,7 @@
     <groupId>org.glyptodon.guacamole</groupId>
     <artifactId>guacamole-auth-shibble</artifactId>
     <packaging>jar</packaging>
-    <version>0.9.9</version>
+    <version>0.9.9-3</version>
     <name>guacamole-auth-shibble</name>
     <url>http://guacamole.sourceforge.net/</url>
 
