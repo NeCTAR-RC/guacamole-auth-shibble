@@ -322,7 +322,7 @@ public class ShibbleAuthenticationProvider extends SimpleAuthenticationProvider 
             //initialize the jdbc driver
             Class.forName(JDBC_DRIVER);
             con = DriverManager.getConnection("jdbc:mysql://" + mysqlHost + ":" + mysqlPort + "/" + mysqlDatabase, mysqlUsername, mysqlPassword);
-            String query = "SELECT password FROM user where lower(user.email) = ?";
+            String query = "SELECT password FROM user where lower(user.user_id) = ?";
             stmt = con.prepareStatement(query);
             stmt.setString(1, remoteUser.toLowerCase());
 
